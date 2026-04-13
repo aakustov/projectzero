@@ -1,0 +1,111 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %} <!-- Гарантируем наличие куки -->
+    <script>
+    let currentQuestionId = null;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Отрисовка статистики из объекта данных
+    function renderStats(stats) {
+        const percent = Math.min((stats.question_count / stats.total_limit) * 100, 100);
+        document.getElementById('progress-bar').style.width = percent + '%';
+        document.getElementById('progress-percent').textContent = Math.round(percent) + '%';
+        document.getElementById('current-num').textContent = `Вопрос ${stats.question_count} из ${stats.total_limit}`;
+        
+        document.getElementById('stats').innerHTML = `
+            <div class="d-flex justify-content-center gap-5 opacity-75 small fw-bold">
+                <span class="text-success"><i class="fas fa-check"></i> ${stats.correct_count}</span>
+                <span class="text-danger"><i class="fas fa-times"></i> ${stats.wrong_count}</span>
+            </div>`;
+    }
+
+    function loadQuestion() {
+        const container = document.getElementById('question-container');
+        // Убираем задержку setTimeout, если она бесит, или оставляем минимальную
+        document.getElementById('result-message').innerHTML = '';
+        document.getElementById('next-question-btn').style.display = 'none';
+
+        fetch('/roundone/next_question/')
+            .then(r => r.json())
+            .then(data => {
+                if (data.finish) { window.location.href = '/roundone/result/'; return; }
+                
+                currentQuestionId = data.question_id;
+                container.innerHTML = `
+                    <h1 class="text-center mb-4 fade-in">${data.question}</h1>
+                    <div class="answers-grid" id="grid"></div>`;
+
+                const grid = document.getElementById('grid');
+                [data.variant_1, data.variant_2, data.variant_3, data.variant_4].forEach(v => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-btn fade-in';
+                    btn.textContent = v;
+                    btn.onclick = () => selectAnswer(v, btn);
+                    grid.appendChild(btn);
+                });
+            });
+    }
+
+    function selectAnswer(variant, clickedBtn) {
+        const buttons = document.querySelectorAll('.answer-btn');
+        buttons.forEach(btn => btn.disabled = true);
+
+        fetch('/roundone/answer/', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'X-CSRFToken': getCookie('csrftoken') 
+            },
+            body: new URLSearchParams({ 'answer': variant, 'question_id': currentQuestionId })
+        })
+        .then(r => r.json())
+        .then(data => {
+            const msg = document.getElementById('result-message');
+            msg.innerHTML = data.correct 
+                ? `<span class="text-success fade-in">Правильно!</span>` 
+                : `<span class="text-danger fade-in">Ошибка!</span>`;
+
+            if (data.correct) {
+                document.getElementById('sound-success').play();
+            } else {
+                document.getElementById('sound-error').play();
+                clickedBtn.classList.add('shake');
+            }
+
+            // Подсвечиваем кнопки
+            buttons.forEach(btn => {
+                if (btn.textContent.trim() === data.correct_answer) btn.style.backgroundColor = '#28a745';
+                if (!data.correct && btn.textContent.trim() === variant) btn.style.backgroundColor = '#dc3545';
+            });
+
+            // Обновляем статистику СРАЗУ из ответа answer/
+            renderStats(data.stats);
+
+            if (data.finish) {
+                document.getElementById('finish-round-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('next-question-btn').style.display = 'inline-block';
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadQuestion);
+    document.getElementById('next-question-btn').onclick = loadQuestion;
+    </script>
+{% endblock %}

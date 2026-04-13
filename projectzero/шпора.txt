@@ -1,0 +1,125 @@
+
+########### новый проект ###########
+
+django-admin startproject <название проекта>
+
+########### новое приложение ###########
+
+python manage.py  startapp <название приложения>
+
+########### регистрация приложения ###########
+
+<название проекта>/<название проекта>/settings.py 
+
+INSTALLED_APPS = [
+    '<название приложения>',
+    ...
+]
+
+########### отслеживание urls ###########
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+<название проекта>/<название проекта>/urls.py
+
+from django.urls import path, <include>
+
+urlpatterns = [
+    path('<название приложения>', include('<название приложения>.urls')),
+    ...
+    path('admin/', admin.site.urls),
+]
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+<название проекта>/<название приложения>/views.py
+
+def <метод>():
+    ....
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+<название проекта>/<название приложения>/urls.py
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.<метод>),  
+]
+
+
+
+########### подключение html-шаблонов ###########
+
+
+<название проекта>/<название приложения>/templates/<название приложения>/layout.html
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% end block %}</title>
+</head>
+<body>
+    {% block content %}
+    {% end block %}
+</body>
+</html>
+
+<название проекта>/<название приложения>/templates/<название приложения>/<метод.html>
+
+{% extends 'main/layout.html' %}
+
+{% block title %}
+<заголовок>
+{% endblock %}
+
+{% block content %}
+    <контент>
+    {% include 'main/include.html' %}
+{% endblock %}
+
+
+
+<название проекта>/<название приложения>/views.py
+
+from django.shortcuts import render
+
+def <метод>(request):
+    return render(request, '<название приложения>/<метод.html>')
+
+<название проекта>/settings.py
+TEMPLATES = [
+        ...
+        'DIRS': [
+            os.path.join(BASE_DIR, <название приложения>, 'templates'),  # путь к папке templates из <название приложения>
+        ],
+        ...
+
+########### стили от бутстрап ###########
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+########### стили из css ###########
+<название проекта>/settings.py
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'main', 'static'), # путь к папке templates из main
+]
+
+
+########### старт сервера ###########
+python manage.py runserver
+
+########### миграции ###########
+
+python manage.py makemigrations
+
+python manage.py migrate
+
+
+########### админка ###########
+python manage.py migrate

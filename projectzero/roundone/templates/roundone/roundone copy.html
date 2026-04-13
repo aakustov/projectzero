@@ -1,0 +1,181 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+    <div class="features">
+        <div id="question-container"></div>
+        <div id="result-message"></div>
+        <div id="stats"></div>
+        <div id="error-message"></div> <!-- Контейнер для критических ошибок -->
+        
+        <div class="controls-container">
+            <button class="btn btn-warning" id="next-question-btn" style="display:none;">
+                Следующий вопрос <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+            <button class="btn btn-success" id="finish-round-btn" style="display:none;">
+                Посмотреть результат <i class="fas fa-flag-checkered ms-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <style>
+    .answers-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 10px;
+        margin-top: 20px;
+    }
+    .answer-btn { padding: 15px; font-weight: bold; }
+    .alert-error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+    </style>
+
+    <script>
+    let currentQuestionId = null;
+
+    // Вспомогательная функция для обработки ошибок сети и сервера
+    function handleResponse(response) {
+        if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status} (${response.statusText})`);
+        }
+        return response.json();
+    }
+
+    // Отображение ошибок пользователю
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.innerHTML = `<div class="alert-error">${message}</div>`;
+        setTimeout(() => { errorDiv.innerHTML = ''; }, 5000); // Скрыть через 5 сек
+    }
+
+    function loadQuestion() {
+        // Очистка перед загрузкой
+        document.getElementById('result-message').textContent = '';
+        document.getElementById('next-question-btn').style.display = 'none';
+        document.getElementById('finish-round-btn').style.display = 'none';
+        document.getElementById('error-message').innerHTML = '';
+
+        fetch('/roundone/next_question/')
+            .then(handleResponse)
+            .then(data => {
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+                currentQuestionId = data.question_id;
+                
+                const container = document.getElementById('question-container');
+                container.innerHTML = `
+                    <h1>${data.question}</h1>
+                    <p>Выбери правильный ответ</p>
+                    <div class="answers-grid" id="answers-wrapper"></div>
+                `;
+
+                const wrapper = document.getElementById('answers-wrapper');
+                [data.variant_1, data.variant_2, data.variant_3, data.variant_4].forEach(variant => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-outline-warning answer-btn';
+                    btn.textContent = variant;
+                    btn.onclick = () => selectAnswer(variant);
+                    wrapper.appendChild(btn);
+                });
+            })
+            .catch(error => {
+                console.error('Load Error:', error);
+                showError("Не удалось загрузить вопрос. Проверьте интернет-соединение.");
+            });
+    }
+
+    function selectAnswer(selectedVariant) {
+        const buttons = document.querySelectorAll('.answer-btn');
+        buttons.forEach(btn => btn.disabled = true); 
+
+        fetch('/roundone/answer/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: new URLSearchParams({
+                'answer': selectedVariant,
+                'question_id': currentQuestionId,
+            })
+        })
+        .then(handleResponse)
+        .then(data => {
+            const messageDiv = document.getElementById('result-message');
+            const correctAnswer = data.correct_answer;
+
+            buttons.forEach(btn => {
+                const btnText = btn.textContent.trim();
+                // Сначала очищаем старые классы оформления
+                btn.classList.remove('btn-outline-warning', 'btn-warning');
+                
+                if (btnText === correctAnswer) {
+                    btn.classList.add('btn-success');
+                } else if (btnText === selectedVariant && !data.correct) {
+                    btn.classList.add('btn-danger');
+                }
+            });
+
+            messageDiv.innerHTML = data.correct 
+                ? `<b style="color:green;">Верно!</b>` 
+                : `<b style="color:red;">Не верно!</b>`;
+
+            updateStats();
+
+            if (data.finish) {
+                document.getElementById('finish-round-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('next-question-btn').style.display = 'inline-block';
+            }
+        })
+        .catch(error => {
+            console.error('Answer Error:', error);
+            showError("Ошибка при отправке ответа.");
+            buttons.forEach(btn => btn.disabled = false); // Возвращаем доступ к кнопкам при ошибке
+        });
+    }
+
+    function updateStats() {
+        fetch('/roundone/statistics/')
+            .then(handleResponse)
+            .then(data => {
+                document.getElementById('stats').innerHTML = `
+                    <hr>
+                    <p>Вопросов пройдено: <b>${data.question_count}</b></p>
+                    <p>Правильно: <span style="color:green">${data.correct_count}</span> | 
+                       Ошибок: <span style="color:red">${data.wrong_count}</span></p>
+                `;
+            })
+            .catch(err => console.warn('Статистика временно недоступна'));
+    }
+
+    document.getElementById('next-question-btn').onclick = function() {
+        this.disabled = true; // Защита от спам-кликов
+        loadQuestion();
+        this.disabled = false;
+    };
+
+    document.getElementById('finish-round-btn').onclick = () => window.location.href = '/roundone/result/';
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    loadQuestion();
+    </script>
+{% endblock %}

@@ -1,0 +1,217 @@
+
+
+* { box-sizing: border-box; }
+
+body {
+    background-color: #141414;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Сайдбар */
+aside {
+    width: 280px;
+    background: #1f1f1f;
+    padding: 2rem 1.5rem;
+    border-right: 3px solid #e50914;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 3rem;
+}
+
+.logo-img {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    border: 2px solid #e50914;
+}
+
+.logo-text {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #e50914;
+    text-transform: uppercase;
+}
+
+aside ul { list-style: none; padding: 0; }
+aside ul li { margin-bottom: 10px; }
+aside ul a {
+    color: #aaa;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+aside ul a:hover {
+    background: rgba(229, 9, 20, 0.1);
+    color: #fff;
+    transform: translateX(5px);
+}
+
+/* Контент */
+main {
+    margin-left: 280px; 
+    flex: 1;
+    padding: 50px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.features {
+    width: 100%;
+    max-width: 750px;
+}
+
+/* Прогресс-бар */
+.progress-wrapper { margin-bottom: 40px; }
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    color: #888;
+}
+
+.progress-container {
+    height: 10px;
+    background: #333;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+#progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ffc107, #e50914);
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Кнопки ответов */
+.answers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.answer-btn {
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #444;
+    background: #252525;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease !important;
+}
+
+.answer-btn:hover:not(:disabled) {
+    border-color: #ffc107;
+    background: #2a2a2a;
+    transform: translateY(-3px);
+}
+
+.answer-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+
+/* Кнопки управления */
+.control-btn {
+    width: 100%;
+    padding: 15px 35px;
+    border-radius: 50px;
+    border: none;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#next-question-btn { background-color: #ffc107; color: #000; }
+#finish-round-btn { background-color: #28a745; color: #fff; }
+
+.control-btn:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+/* Анимации */
+.fade-in { animation: fadeIn 0.5s ease forwards; }
+.fade-out { animation: fadeOut 0.4s ease forwards; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-10px); }
+}
+
+.shake { animation: shake 0.4s ease-in-out; }
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(8px); }
+    75% { transform: translateX(-8px); }
+}
+
+.result-card {
+    background: #1f1f1f;
+    padding: 3rem;
+    border-radius: 25px;
+    border: 1px solid #333;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+}
+
+.result-score {
+    font-size: 5rem;
+    font-weight: 800;
+    margin: 1rem 0;
+    line-height: 1;
+}
+
+.score-good { color: #28a745; text-shadow: 0 0 20px rgba(40, 167, 69, 0.3); }
+.score-bad { color: #e50914; text-shadow: 0 0 20px rgba(229, 9, 20, 0.3); }
+
+.medal-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.result-details {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 2rem 0;
+    padding: 1rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+}

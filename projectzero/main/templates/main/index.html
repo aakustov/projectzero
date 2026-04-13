@@ -1,0 +1,91 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="features fade-in">
+    <div class="result-card shadow-lg p-5">
+        <!-- Анимированная иконка камеры -->
+        <div class="mb-4">
+            <i class="fas fa-video fa-5x text-danger floating"></i>
+        </div>
+
+        <h1 class="display-4 fw-bold mb-4">{{ title }}</h1>
+        
+        <div class="px-md-4">
+            <p class="lead text-white mb-4">
+                Добро пожаловать в мир, где кино становится увлекательной игрой! 
+                Готовы ли вы испытать свою эрудицию и узнать, насколько хорошо вы разбираетесь в магии большого экрана?
+            </p>
+            
+            <div class="text-muted mb-5 small-text-box">
+                <p>На нашем сайте вас ждёт уникальная викторина: от золотой классики Голливуда до современных фестивальных шедевров. 
+                Угадывайте фильмы по описанию, узнавайте культовых актёров и открывайте редкие кинематографические жемчужины. 
+                Каждая игра — это вызов вашему кругозору и шанс стать настоящим киноманом!</p>
+            </div>
+        </div>
+
+        <!-- Кнопка с эффектом свечения -->
+        <div class="mt-4">
+            <a href="{% url 'start' %}" class="control-btn btn-warning glow-button px-5 py-3" id="magic-btn" style="text-decoration: none; display: inline-block;">
+                <i class="fas fa-magic me-2"></i> Волшебная кнопка
+            </a>
+        </div>
+
+        <!-- Вывод объектов (если есть) -->
+        {% if obj %}
+            <div class="mt-5 border-top border-secondary pt-4">
+                <h5 class="text-uppercase text-secondary small tracking-widest mb-3">Новинки базы:</h5>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                {% for val in obj %}
+                    <span class="badge rounded-pill bg-dark text-danger border border-danger p-2 px-3">
+                        {{ val|upper }}
+                    </span>
+                {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* Эффект плавания для иконки */
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+    @keyframes floating {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+
+    /* Свечение кнопки */
+    .glow-button {
+        box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+        transition: 0.4s !important;
+    }
+    .glow-button:hover {
+        box-shadow: 0 0 30px rgba(255, 193, 7, 0.7);
+        transform: scale(1.05) translateY(-3px);
+    }
+
+    .small-text-box {
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.8;
+        background: rgba(255,255,255,0.03);
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    .tracking-widest { letter-spacing: 0.2em; }
+</style>
+
+<script>
+    // Эффект при нажатии на волшебную кнопку
+    document.getElementById('magic-btn').onclick = function(e) {
+        // Если это не ссылка на старт, можно добавить анимацию
+        console.log("Магия активирована!");
+    };
+</script>
+{% endblock %}
