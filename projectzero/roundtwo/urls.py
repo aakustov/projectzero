@@ -6,7 +6,7 @@ urlpatterns = [
     path('next_question/', views.next_question, name='next_question'),
     path('answer/', views.answer_question, name='answer_question'),
     path('result/', views.result_view, name='result'),
-    path('start/', views.start_view, name='start'),
+    path('start2/', views.start_view, name='start2'),
     #path('statistics/', views.get_statistics, name='get_statistics'),
-    path('leaderboard', views.leaderboard_view, name='leaderboard')
+    path('leaderboard2', views.leaderboard_view, name='leaderboard2')
 ]

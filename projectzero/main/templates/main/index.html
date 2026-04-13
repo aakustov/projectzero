@@ -28,24 +28,12 @@
 
         <!-- Кнопка с эффектом свечения -->
         <div class="mt-4">
-            <a href="{% url 'start' %}" class="control-btn btn-warning glow-button px-5 py-3" id="magic-btn" style="text-decoration: none; display: inline-block;">
+            <a href="{% url 'start1' %}" class="control-btn btn-warning glow-button px-5 py-3" id="magic-btn" style="text-decoration: none; display: inline-block;">
                 <i class="fas fa-magic me-2"></i> Волшебная кнопка
             </a>
         </div>
 
-        <!-- Вывод объектов (если есть) -->
-        {% if obj %}
-            <div class="mt-5 border-top border-secondary pt-4">
-                <h5 class="text-uppercase text-secondary small tracking-widest mb-3">Новинки базы:</h5>
-                <div class="d-flex flex-wrap justify-content-center gap-3">
-                {% for val in obj %}
-                    <span class="badge rounded-pill bg-dark text-danger border border-danger p-2 px-3">
-                        {{ val|upper }}
-                    </span>
-                {% endfor %}
-                </div>
-            </div>
-        {% endif %}
+
     </div>
 </div>
 

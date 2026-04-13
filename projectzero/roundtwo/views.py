@@ -136,4 +136,4 @@ def result_view(request):
 def leaderboard_view(request):
     # Сортировка: сначала по кол-ву верных (DESC), затем по общему кол-ву вопросов (ASC)
     top_records = GameRecord.objects.order_by('-correct_answers', 'total_questions')[:10]
-    return render(request, 'roundone/leaderboard.html', {'records': top_records})
+    return render(request, 'roundtwo/leaderboard.html', {'records': top_records})
