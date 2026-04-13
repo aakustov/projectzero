@@ -1,0 +1,79 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="features fade-in">
+        <div class="result-card shadow-lg p-5 text-center">
+            <!-- Анимированная иконка хлопушки -->
+            <div class="mb-4">
+                <i class="fas fa-clapperboard fa-5x text-danger clapper-animation"></i>
+            </div>
+
+            <h1 class="display-4 fw-bold mb-3">Приготовились...</h1>
+            <p class="lead text-muted mb-5">
+                Камера! Мотор! <br> 
+                Пора показать всем, кто здесь настоящий знаток кино.
+            </p>
+
+            <!-- Кнопка старта с пульсацией -->
+            <div class="mt-2">
+                <button class="control-btn btn-warning glow-button px-5 py-3" id="start-game-btn" style="font-size: 1.3rem;">
+                    <i class="fas fa-play me-2"></i> Начать игру
+                </button>
+            </div>
+
+            <div class="mt-4 text-secondary small opacity-50">
+                <i class="fas fa-clock me-1"></i> Примерное время раунда: 3-5 минут
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Анимация хлопушки при загрузке */
+        .clapper-animation {
+            animation: clap 0.8s ease-out;
+            transform-origin: bottom left;
+        }
+
+        @keyframes clap {
+            0% { transform: rotate(-20deg); }
+            50% { transform: rotate(0deg); }
+            70% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Пульсирующая кнопка для привлечения внимания */
+        .glow-button {
+            animation: pulse-gold 2s infinite;
+            transition: 0.3s !important;
+        }
+
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.5); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 193, 7, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        }
+
+        .glow-button:hover {
+            transform: scale(1.08);
+            filter: brightness(1.1);
+            animation: none;
+        }
+    </style>
+
+    <script>
+        document.querySelector('#start-game-btn').onclick = function() {
+            // Добавляем микро-задержку для красоты, если нужно, или сразу редирект
+            this.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i> Загрузка...';
+            this.disabled = true;
+            
+            // Звук хлопушки (если есть в статике)
+            const startSound = document.getElementById('sound-success');
+            if (startSound) startSound.play();
+
+            window.location.href = '/roundone/?reset=1';
+        };
+    </script>
+{% endblock %}

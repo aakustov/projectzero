@@ -18,7 +18,7 @@ def start_view(request):
     request.session.modified = True
     return render(request, 'roundone/start.html')
 
-def roundone(request):
+def roundtwo(request):
 
     start = time.time()
     # Проверяем, пришел ли флаг сброса

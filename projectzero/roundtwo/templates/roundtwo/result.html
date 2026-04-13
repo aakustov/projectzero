@@ -1,0 +1,65 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Результаты раунда{% endblock %}
+
+{% block content %}
+<div class="features fade-in">
+    <div class="result-card">
+        <!-- Скрытые данные для JS, чтобы редактор не ругался -->
+        <input type="hidden" id="js-correct-count" value="{{ correct_count }}">
+        <input type="hidden" id="js-total-count" value="{{ question_count }}">
+
+        <div class="medal-icon">
+            {% if correct_count >= 15 %}
+                <i class="fas fa-trophy" style="color: #ffd700;"></i>
+            {% elif correct_count >= 10 %}
+                <i class="fas fa-medal" style="color: #c0c0c0;"></i>
+            {% else %}
+                <i class="fas fa-film" style="color: #cd7f32;"></i>
+            {% endif %}
+        </div>
+
+        <h1>Раунд завершен!</h1>
+        <p class="text-muted">Твой итоговый результат:</p>
+
+        <div class="result-score {% if correct_count >= 10 %}score-good{% else %}score-bad{% endif %}">
+            {{ correct_count }} <span style="font-size: 2rem; color: #555;">/ {{ question_count }}</span>
+        </div>
+
+        <div class="result-details">
+            <div>
+                <small class="d-block text-uppercase text-muted">Верно</small>
+                <b class="text-success h4">{{ correct_count }}</b>
+            </div>
+            <div style="border-left: 1px solid #444;"></div>
+            <div>
+                <small class="d-block text-uppercase text-muted">Ошибки</small>
+                <b class="text-danger h4">{{ wrong_count }}</b>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="{% url 'start' %}" class="control-btn btn-warning d-inline-block px-5" style="text-decoration: none;">
+                <i class="fas fa-redo me-2"></i> Играть снова
+            </a>
+            <br>
+            <a href="{% url 'home' %}" class="btn btn-link mt-3 text-muted" style="text-decoration: none;">
+                На главную
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Теперь JS берет данные из скрытых input, и ошибки "Property assignment expected" исчезнут
+    document.addEventListener('DOMContentLoaded', () => {
+        const score = parseInt(document.getElementById('js-correct-count').value) || 0;
+        
+        if (score >= 15) {
+            console.log("Киноман детектед!");
+            // Здесь можно запустить эффект, например салют
+        }
+    });
+</script>
+{% endblock %}
